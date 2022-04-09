@@ -4,39 +4,39 @@ import "./Feed.css";
 import InputOptions from "./InputOptions";
 import Post from "./Post";
 import {db} from "./firebase";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc,query, orderBy, limit } from "firebase/firestore";
 
 function Feed() {
 
     const [input, setInput] = useState("");
     const [posts, setPosts] = useState([])
+    const [render, setRender] = useState(false);
 
     const firebasePosts = collection(db,"posts");
-
+    
     const sendPost = (e) => {
         e.preventDefault();
         addDoc(firebasePosts, {
-            name:"John Doe",
-            description : 'I am a software developer',
-            'message ' : input,
+            name:"Martin Feuillet",
+            description: 'author of the page',
+            message: input,
+            photoUrl: 'https://picsum.photos/200/300',
+            timestamp: new Date().toLocaleString()
         })
+        setInput("");
+        setRender(!render);
     }
 
     const getPosts = async () => {
-        const data = await getDocs(firebasePosts);
+        const q=query(firebasePosts,orderBy("timestamp","desc"),limit(10));
+        const data = await getDocs(q);
         setPosts(data.docs.map((doc) => ({...doc.data(), id: doc.id})))
     };
 
     useEffect(() => {
-        // collection(db,"posts").onSnapshot((snapshot) => (
-        //     setPosts(snapshot.docs.map((doc) => ({
-        //         id: doc.id,
-        //         data : doc.data(),
-        //     })))
-        // ))
         getPosts();
-    },[])
-    console.log(posts);
+    },[render])
+
     return (
         <div className="feed">
             <div className="feed__inputContainer">
@@ -56,14 +56,10 @@ function Feed() {
             </div>
 
         {/* Post */}
-        {posts.map(post => (
-            <Post message={post.data} />
+        {posts.map(({id, name,description,message, photoUrl}) => (
+            <Post key={id} name={name} description={description}  message={message} photoUrl = {photoUrl} />
         ))}
-        <Post 
-        name = "Martin Feuillet"
-        descrition="this is a test"
-        message="let's go"
-         />
+        
 
         </div>
 

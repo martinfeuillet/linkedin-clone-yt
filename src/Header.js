@@ -11,7 +11,7 @@ function Header() {
             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" alt="img"/>
                 <div className="header__search">
                     <SearchIcon />
-                    <input type="text" />
+                    <input placeholder="search" type="text" />
                 </div>
             </div>
             <div className="header__right">
